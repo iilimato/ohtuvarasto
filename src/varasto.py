@@ -3,7 +3,7 @@ class Varasto:
         self.tilavuus = self._validoi_tilavuus(tilavuus)
         self.saldo = self._validoi_saldo(alku_saldo, self.tilavuus)
 
-    def _validoi_tilavuus(self, tilavuus): #tämä rivi on tarkoituksella liian pitkä että se aiheuttaisi virheen jne jne jne jne jne jne jne eeweeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+    def _validoi_tilavuus(self, tilavuus):
         if tilavuus > 0.0:
             return tilavuus
         return 0.0
