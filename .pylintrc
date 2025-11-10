@@ -1,0 +1,26 @@
+[MASTER]
+
+ignore=CVS,.git,__pycache__,.pytest_cache
+
+[MESSAGE CONTROL]
+
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring
+
+[FORMAT]
+
+max-line-length=80
+
+indent-string='    '
+
+[REFACTORING]
+
+max-nested-blocks=2
+
+[DESIGN]
+
+max-statements=10
+
+max-args=5
