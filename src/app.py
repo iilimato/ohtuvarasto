@@ -39,22 +39,32 @@ def index():
     return render_template('index.html', warehouses=store.all())
 
 
+def _validate_warehouse_form(form_data):
+    name = form_data.get('name', '').strip()
+    try:
+        capacity = float(form_data.get('capacity', 0))
+        initial = float(form_data.get('initial', 0))
+    except ValueError:
+        return None, 'Invalid number format'
+
+    if not name:
+        return None, 'Name is required'
+    if capacity < 0:
+        return None, 'Capacity must be non-negative'
+    if initial < 0:
+        return None, 'Initial balance must be non-negative'
+
+    return (name, capacity, initial), None
+
+
 @app.route('/create', methods=['GET', 'POST'])
 def create_warehouse():
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        try:
-            capacity = float(request.form.get('capacity', 0))
-            initial = float(request.form.get('initial', 0))
-        except ValueError:
-            return render_template(
-                'create.html',
-                error='Invalid number format'
-            )
+        result, error = _validate_warehouse_form(request.form)
+        if error:
+            return render_template('create.html', error=error)
 
-        if not name:
-            return render_template('create.html', error='Name is required')
-
+        name, capacity, initial = result
         store.add(name, Varasto(capacity, initial))
         return redirect(url_for('index'))
 
@@ -111,8 +121,14 @@ def edit_warehouse(warehouse_id):
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
-        if name:
-            warehouse['name'] = name
+        if not name:
+            return render_template(
+                'edit.html',
+                warehouse_id=warehouse_id,
+                warehouse=warehouse,
+                error='Name is required'
+            )
+        warehouse['name'] = name
         return redirect(url_for('view_warehouse', warehouse_id=warehouse_id))
 
     return render_template(
@@ -129,4 +145,4 @@ def delete_warehouse(warehouse_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

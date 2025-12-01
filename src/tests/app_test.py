@@ -126,3 +126,33 @@ class TestApp(unittest.TestCase):
     def test_edit_nonexistent_warehouse(self):
         response = self.app.get('/warehouse/999/edit', follow_redirects=False)
         self.assertEqual(response.status_code, 302)
+
+    def test_create_warehouse_negative_capacity(self):
+        response = self.app.post('/create', data={
+            'name': 'Test',
+            'capacity': '-10',
+            'initial': '0'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Capacity must be non-negative', response.data)
+        self.assertEqual(len(store.warehouses), 0)
+
+    def test_create_warehouse_negative_initial(self):
+        response = self.app.post('/create', data={
+            'name': 'Test',
+            'capacity': '100',
+            'initial': '-10'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Initial balance must be non-negative', response.data)
+        self.assertEqual(len(store.warehouses), 0)
+
+    def test_edit_warehouse_empty_name(self):
+        store.add('Test Warehouse', Varasto(100, 50))
+        response = self.app.post('/warehouse/1/edit', data={
+            'name': ''
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Name is required', response.data)
+        warehouse = store.get(1)
+        self.assertEqual(warehouse['name'], 'Test Warehouse')
